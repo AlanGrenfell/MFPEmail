@@ -33,6 +33,13 @@ class MFP:
         avgWk = round(sum(lizt) / len(lizt))
         return avgWk
 
+    def getWeightWkAvg( self ):
+        """ returns avg/week kcal from exercise """
+        weekrange = self.Client.get_report("Weight", "Progress", self.T, self.Tminus7)
+        lizt = list(weekrange.values())
+        avgWk = round(sum(lizt) / len(lizt))
+        return avgWk
+
     def cardioToSteps(self):
         """ returns avg/week step count estimate """
         return self.getCardioWkAvg()/0.03
