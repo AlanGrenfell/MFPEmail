@@ -33,25 +33,24 @@ class MFP:
         avgWk = round(sum(lizt) / len(lizt))
         return avgWk
 
-    def getWeightWkAvg( self ):
-        """ returns avg/week kcal from exercise """
-        weekrange = self.Client.get_report("Weight", "Progress", self.T, self.Tminus7)
-        lizt = list(weekrange.values())
+    def getWeightWkAvg( self, diff=False ):
+        """ returns avg/week weight """
+        weekRange = self.Client.get_report("Weight", "Progress", self.T, self.Tminus7)
+        lizt = list(weekRange.values())
         avgWk = round(sum(lizt) / len(lizt))
+        if diff:
+            Tminus14 = self.Tminus7 - dt.timedelta(days=7)
+            lastWeekRange = self.Client.get_report("Weight", "Progress",self.Tminus7, Tminus14)
+            lizt2 = list(lastWeekRange.values())
+            avgLastWk = round(sum(lizt2) / len(lizt2))
+            return avgWk - avgLastWk
         return avgWk
+
 
     def cardioToSteps(self):
         """ returns avg/week step count estimate """
         return self.getCardioWkAvg()/0.03
-    # def get_measurements(
-    #         self,
-    #         measurement="Weight",
-    #         lower_bound: Optional[datetime.date] = None,
-    #         upper_bound: Optional[datetime.date] = None,
-    # )
 
-    # def get_date(self, *args, **kwargs) -> Day:
-    #     """Returns your meal diary for a particular date"""
 
 if __name__ == '__main__':
     print(MFP().getCardioWkAvg()) # 0.03kcal/step
