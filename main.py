@@ -3,16 +3,18 @@
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 import myfitnesspal
-from MFPCreds import name, pw
+from MFPCreds import name, pw, email, emailpw
 import datetime as dt
+import smtplib, ssl
+import bs4,webbrowser
+import requests
+import time
 
 
 class MFP:
 
     def __init__(self):
-        self.NAME = name
-        self.PW = pw
-        self.Client = myfitnesspal.Client(self.NAME, password=self.PW)
+        self.Client = myfitnesspal.Client(name, password=pw)
         self.T = dt.date.today() - dt.timedelta(days=1)
         self.Tminus7 = self.T - dt.timedelta(days=7)
 
@@ -46,12 +48,58 @@ class MFP:
             return avgWk - avgLastWk
         return avgWk
 
-
     def cardioToSteps(self):
         """ returns avg/week step count estimate """
         return self.getCardioWkAvg()/0.03
 
+def get_data():
+    client = MFP()
+    weight_change = client.getWeightWkAvg( diff=True )
+    nutrition_dict = client.getNutritionDictwkAvg()
+    email_string = ''
+
+#autocoachpython@gmail.com
+#PassWork90!
+def sendMail():
+    smtp_server = "smtp.gmail.com"
+    port = 587                                    # For starttls
+    sender_email = email               #sender's mail id
+    receiver_email  = ['alangrenfell@gmail.com']        #list of reciever's mail ids
+    password = emailpw
+
+    subject="Auto Coach"
+    text = get_data()
+    message = 'Subject: {}\n\n{}'.format(subject, text)
+
+    # Create a secure SSL context
+    context = ssl.create_default_context()
+
+    # Try to log in to server and send email
+    try:
+        server = smtplib.SMTP(smtp_server,port)
+        server.ehlo()                               # Can be omitted
+        server.starttls(context=context)            # Secure the connection
+        server.ehlo()
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, message)
+
+    except Exception as e:
+        print(e)
+
+def get_data():
+    client = MFP()
+    weight_change = client.getWeightWkAvg( diff=True )
+    nutrition_dict = client.getNutritionDictwkAvg()
+    cardio = client.getCardioWkAvg()
+    stri = ''
+    for k, v in nutrition_dict.items():
+        stri += (str(k) + ': ' + str(v) + ', ')
+
+    email_string = 'macros: {}, kcal: {}, weight change: {}, steps: {}, cardio kcal: {}'.format(stri, nutrition_dict['calories'], weight_change, cardio)
+    return email_string
+
+def run():
+    pass
 
 if __name__ == '__main__':
-    print(MFP().getCardioWkAvg()) # 0.03kcal/step
-
+    run()
