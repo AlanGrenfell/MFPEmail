@@ -52,11 +52,6 @@ class MFP:
         """ returns avg/week step count estimate """
         return self.getCardioWkAvg()/0.03
 
-def get_data():
-    client = MFP()
-    weight_change = client.getWeightWkAvg( diff=True )
-    nutrition_dict = client.getNutritionDictwkAvg()
-    email_string = ''
 
 #autocoachpython@gmail.com
 #PassWork90!
@@ -98,8 +93,3 @@ def get_data():
     email_string = 'macros: {}, kcal: {}, weight change: {}, steps: {}, cardio kcal: {}'.format(stri, nutrition_dict['calories'], weight_change, cardio)
     return email_string
 
-def run():
-    pass
-
-if __name__ == '__main__':
-    run()
